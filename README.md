@@ -75,8 +75,8 @@ from other datasets such as Pascal).
 
 ### Examples Folder: 
 Contains a collection of Jupyter Notebooks, each of which uses the library to analyze 1 particular dataset. 
-For each notebook there is a folder with the same name, which contains any saved models, Kaggle submissions,
-or other important files related to the dataset. The datasets themselves are not contained in this repository, 
+For each notebook there is a folder with the same name, which contains any Kaggle submissions or other 
+important files related to the dataset. The datasets themselves are not contained in this repository, 
 for storage reasons, but each notebook provides a link to where the data can be downloaded. 
 The datasets analyzed include:
 
