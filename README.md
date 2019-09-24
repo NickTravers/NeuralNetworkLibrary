@@ -7,15 +7,7 @@ The library was inspired by the 2018 version of the fastai course (http://course
 
 Moreover, the library has evolved somewhat beyond its original intent as I have been working on it, to include some additional content. Most notably, the section for bounding box object detection differs substantially from fastai, and also borrows from the RetinaNet implementation by Yann Henon (https://github.com/yhenon/pytorch-retinanet). Also, a large section on pre-processing and exploratory data analysis for structured data problems has been added, and some extra functionality for visualization and statistical analysis of image data has been incorporated as well.
 
-
-## 2. SOFTWARE REQUIREMENTS
-Anaconda python version 3.7 with following packages installed:
-1. pytorch version 1.2 + torchvision version 0.4
-2. OpenCV
-3. GPUtil
-
-
-## 3. HARDWARE REQUIREMENTS
+## 2. HARDWARE REQUIREMENTS
 Code is written for a machine containing a single Nvidia GPU. Code will not run on a machine without a GPU, 
 and if a machine has multiple GPUs only 1 of them will be utilized (at least so far). 
 
@@ -23,6 +15,12 @@ I have run all my notebooks on a Paperspace P6000 machine which has the followin
 Quadro P6000 GPU, 8 CPUs, 30G Ram, and 24G GPU Ram. Batch sizes in notebooks may need 
 to be reduced on a machine with significantly less memory. 
 
+## 3. SOFTWARE REQUIREMENTS
+1. Cuda Toolkit version 10.0 or 10.1
+2. Anaconda python version 3.7 with following additional packages installed:
+   * pytorch version 1.2 + torchvision version 0.4
+   * OpenCV
+   * GPUtil
 
 ## 4. CONTENTS
 There are 3 folders: General, Applications, and Examples. 
@@ -77,8 +75,11 @@ from other datasets such as Pascal).
 Contains a collection of Jupyter Notebooks, each of which uses the library to analyze 1 particular dataset. 
 For each notebook there is a folder with the same name, which contains any Kaggle submissions or other 
 important files related to the dataset. The datasets themselves are not contained in this repository, 
-for storage reasons, but each notebook provides a link to where the data can be downloaded. 
-The datasets analyzed include:
+for storage reasons, but each notebook provides a link to where the dataset can be downloaded. 
+
+To view the notebooks, you should download or clone the repository and open them with the Jupyter Notebook Application. If you just click on the notebooks from the GitHub page, an error sometimes comes up loading them (and even if they load the display is a bit off in some places).
+
+The datasets analyzed in the notebooks include:
 
 1. Kaggle Dogs vs. Cats Dataset (Image Classification)
 2. Kaggle Dog Breed Dataset (Image Classification)
