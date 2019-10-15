@@ -19,7 +19,7 @@ to be reduced on a machine with significantly less memory.
 1. Cuda Toolkit version 10.0 or 10.1
 2. Anaconda python 3.7 with following additional packages installed 
    to the default conda environment called 'base':
-   * pytorch version 1.2 + torchvision version 0.4
+   * pytorch version 1.2 and torchvision version 0.4
    * OpenCV
    * GPUtil
    
