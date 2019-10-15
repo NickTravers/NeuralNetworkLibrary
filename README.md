@@ -17,10 +17,16 @@ to be reduced on a machine with significantly less memory.
 
 ## 3. SOFTWARE REQUIREMENTS
 1. Cuda Toolkit version 10.0 or 10.1
-2. Anaconda python version 3.7 with following additional packages installed:
+2. Anaconda python 3.7 with following additional packages installed 
+   to the default conda environment called 'base':
    * pytorch version 1.2 + torchvision version 0.4
    * OpenCV
    * GPUtil
+   
+NOTE 1: Probably any pytorch version 1.2+ should also work, but I did not test. <br>
+NOTE 2: If you create a fresh conda environment with 'conda create --name myenv python=3.7' 
+then many additonal packages will need to be installed. See 'Core.py' file in 'General' folder 
+for list of imports. 
 
 ## 4. CONTENTS
 There are 3 folders: General, Applications, and Examples. 
