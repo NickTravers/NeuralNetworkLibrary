@@ -64,15 +64,17 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 class Learner(object):
     
     """ General class for a neural network model to learn from data. 
-        Can be structured data, collab filter data, or image data.
+        Can be structured data, collab filter data, image data, or text data.
     
     The class contains the pytorch model of the neural network, and also 
     the data, the optimizer, and the loss function. 
     
     Arguments for initialization:
-    PATH: a path where info related to the Learner object is stored.
-    data: a data object of class StructuredDataObj, CollabFilterDataObj, or ImageDataObj. 
-    model: a pytorch model of class StructuredDataNet, CollabFilterNet, ImageClassificationNet, or ObjectDetectionNet.
+    PATH: path where info related to the Learner object is stored.
+    data: data object of class StructuredDataObj, CollabFilterDataObj, ImageDataObj, 
+          LanguageModelDataObj, or TextClassificationDataObj.
+    model: pytorch model of class StructuredDataNet, CollabFilterNet, ImageClassificationNet, 
+           ObjectDetectionNet, LanguageModelNet, or TextClassificationNet.
     optimizer: an optimizer of class Optimizer. Can also specify optimizer as a string by its name in opt_dict. 
     loss_func: Loss function to use, e.g. nn.MSELoss() or nn.CrossEntropyLoss().
                If loss_func == 'default', loss function is chosen based on data.target_type using loss_func_dict. 
@@ -82,7 +84,8 @@ class Learner(object):
                    
     Attributes:
     PATH, data, model, optimizer, loss_func, use_moving_avg: all same as inputs.
-    target_type: Type of output variable y ('cont','cat','single_label','multi_label', or 'bbox'). 
+    target_type: Type of output variable y ('cont', 'cat', 'single_label', 'multi_label', 
+                                            'bbox','lang_model', or 'text_classify'). 
     loss_sched: A sequence of losses obtained on succesive minibatches during training, 
                 or when using learner.find_lr().
     lr_sched: The learning rate schedule, a sequence of learning rates used on succesive minibatches.
@@ -293,9 +296,9 @@ class Learner(object):
             However, for bbox object detection the dataloader must be either 'val' or 'test'.
         
         correct_probs: 
-        Effects only target_type = 'cat', 'single_label', and 'multi_label'. 
-        * If <self.target_type> == 'cat' or 'single_label' and correct_probs == True, then returns as 
-          predictions the softmax function of output activations from network instead of activations themselves.
+        Effects only target_types 'cat', 'single_label', 'multi_label', and 'text_classify'. 
+        * If <self.target_type> == 'cat', 'single_label', or 'text_classify' and correct_probs == True, then returns
+          as predictions the softmax function of output activations from network instead of activations themselves.
         * If <self.target_type> == 'multi_label' and correct_probs == True, then returns as predictions 
           the pointwise sigmoid function of activations from the network instead of activations themselves                       
         **NOTE**: These corrections are useful because normally don't apply softmax/sigmoid to final activations in 
@@ -309,21 +312,22 @@ class Learner(object):
         
         Let N be the length of the dataset set that is being used for making predictions,  
         and in applicable cases also let C be the number of categories. 
-        * If self.target_type == 'cont': predictions is a 1d numpy array of length N, 
+        * If self.target_type == 'cont' then predictions is a 1d numpy array of length N, 
           predictions[i] = predicted continuous output for ith input. 
-        * If self.target_type == 'cat' or 'single_label': predictions = [pred_probs,pred_labels] where:  
+        * If self.target_type == 'cat', single_label', or 'text_classify' then 
+          predictions = [pred_probs,pred_labels] where:  
           - pred_probs is an N by C numpy array with
             pred_probs[i,j] = probabability ith input is of category j
             (or the pre-softmax-ed version of this probability if correct_probs = False). 
           - pred_labels is a 1d integer numpy array of length N, pred_labels[i] is 
             the most likely category in {0,1,...,C-1} for ith input.
-        * If self.target_type == 'multi_label': predictions = [pred_probs,pred_labels] where:
+        * If self.target_type == 'multi_label' then predictions = [pred_probs,pred_labels] where:
           - pred_probs is an N by C numpy array with
             pred_probs[i,j] = probabibility ith input contains an element of category j. 
             (or the pre-sigmoid-ed version of this probability if correct_probs = False).
           - pred_labels = is a 0-1 valued N by C numpy array such that 
             pred_labels[i,j] = 1 if and only if pred_probs[i,j] > 1/2.
-        * If self.target_type == 'bbox': predictions is a list of length N with elements of 
+        * If self.target_type == 'bbox' then predictions is a list of length N with elements of 
           the form [pred_boxes, pred_classes, conf_scores] where:
           - pred_boxes is a list of predicted bounding boxes for a single image in min-max form
           - pred_classes is a list of predicted classes for each of the predicted boxes
@@ -339,6 +343,7 @@ class Learner(object):
         elif dl == 'test': dl = self.data.test_dl
         
         self.model.eval()
+        #if hasattr(self.model, 'reset'): self.model.reset() # for language model
         predictions = []
         
         with torch.no_grad():
@@ -346,11 +351,12 @@ class Learner(object):
             
                 x_batch = to_cuda(x_batch)
                 y_pred = self.predict1minibatch(x_batch)
+                if isinstance(y_pred,tuple): y_pred = y_pred[0]
             
                 if self.target_type == 'cont':
                     predictions.append(ARR(y_pred))
                 
-                elif self.target_type in ['cat','single_label']:
+                elif self.target_type in ['cat','single_label','text_classify']:
                     if correct_probs == False: pred_probs = ARR(y_pred)
                     else: pred_probs = ARR((F.log_softmax(y_pred,dim=1)).exp())
                     pred_labels = pred_probs.argmax(axis=1)
@@ -372,7 +378,7 @@ class Learner(object):
                     if dl==self.data.val_dl: scale = self.data.val_ds.images[j]['scale']
                     elif dl==self.data.test_dl: scale = self.data.test_ds.images[j]['scale']
                     PredBoxes = list_mult(PredBoxes,1/scale) # correct for scaling of images in training
-                    predictions.append([PredBoxes,PredClasses,ConfScores])            
+                    predictions.append([PredBoxes,PredClasses,ConfScores])  
             
         torch.cuda.empty_cache() 
         
@@ -380,7 +386,7 @@ class Learner(object):
         if self.target_type == 'cont':
             predictions = np.concatenate([x for x in predictions])
             
-        elif self.target_type in ['cat','single_label','multi_label']:
+        elif self.target_type in ['cat','single_label','multi_label','text_classify']:
             predictions = [np.concatenate([predictions[i][0] for i in range(len(predictions))]),
                            np.concatenate([predictions[i][1] for i in range(len(predictions))])]
             
@@ -408,7 +414,8 @@ class Learner(object):
                 EndMetrics = True
         
         self.model.eval()
-        total_loss = 0
+        #if hasattr(self.model, 'reset'): self.model.reset() # for language model
+        total_loss, ds_length = 0,0
         
         # evaluation procedure for train dataset
         if dataset_type == 'train':
@@ -419,9 +426,10 @@ class Learner(object):
                     x_batch, y_batch = to_cuda(x_batch), to_cuda(y_batch)
                     y_pred = self.predict1minibatch(x_batch)
                     batch_loss = self.loss_func(y_pred,y_batch).item()
-                    total_loss += bs*batch_loss        
+                    total_loss += bs*batch_loss  
+                    ds_length += bs
             
-            avg_loss = total_loss/len(self.data.train_ds)
+            avg_loss = total_loss/ds_length
             return avg_loss
         
         # evaluation procedure for val dataset
@@ -438,6 +446,7 @@ class Learner(object):
                     y_pred = self.predict1minibatch(x_batch)
                     batch_loss = self.loss_func(y_pred,y_batch).item()
                     total_loss += bs*batch_loss
+                    ds_length += bs
 
                     if EndMetrics == True:
                         YPRED.append(y_pred)
@@ -461,14 +470,14 @@ class Learner(object):
                 for i,m in enumerate(metrics):
                     if m in end_metrics:
                         met = end_metrics[m]()
-                        metric_values[i] = len(self.data.val_ds)*met(YPRED,Y).item()
+                        metric_values[i] = ds_length*met(YPRED,Y).item()
             
-            avg_loss = total_loss/len(self.data.val_ds)
-            metric_values = metric_values/len(self.data.val_ds)
+            avg_loss = total_loss/ds_length
+            metric_values = metric_values/ds_length
             if self.target_type in ['cat','single_label']: 
-                accuracy = num_correct/len(self.data.val_ds)
+                accuracy = num_correct/ds_length
             elif self.target_type == 'multi_label': 
-                accuracy = num_correct/(len(self.data.val_ds)*len(self.data.categories))
+                accuracy = num_correct/(ds_length*len(self.data.categories))
             
             results = [avg_loss]
             if self.target_type in ['cat','single_label','multi_label']: results.append(accuracy)
@@ -574,7 +583,8 @@ class Learner(object):
             start_time = time.time()
             
             #training pass for the epoch
-            self.model.train() 
+            self.model.train()
+            #if hasattr(self.model, 'reset'): self.model.reset() # for language model
             
             if self.bn_frozen in ['all','non_head']:
                 for m in self.model.modules():
@@ -582,7 +592,7 @@ class Learner(object):
             if self.bn_frozen == 'non_head':
                 for m in self.model.head.modules():
                     if isinstance(m,bn_types): m.training = True
-                        
+            
             for j, (x_batch, y_batch) in enumerate(PBarTrain(self.data.train_dl)):
                 
                 start_time_batch = time.time()
@@ -826,6 +836,8 @@ class Learner(object):
         self.init_optimizer(wd,bn_wd,clip)
         
         self.model.train()
+        #if hasattr(self.model, 'reset'): self.model.reset() # for language model
+        
         if self.bn_frozen in ['all','non_head']:
             for m in self.model.modules():
                 if isinstance(m,bn_types): m.training = False

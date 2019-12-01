@@ -9,11 +9,15 @@ from matplotlib import patches, patheffects
 import seaborn as sns
 import sklearn 
 import sklearn.metrics as skm
-import os, time, copy, json
+import spacy
+from spacy.symbols import ORTH
+import os, time, copy
+import re, html, json, pickle
 import cv2, skimage, skimage.io, skimage.transform
-import itertools
-import GPUtil, psutil
+import itertools, collections
 from functools import partial
+from concurrent.futures import ProcessPoolExecutor
+import GPUtil, psutil
 from tqdm import tqdm_notebook
 from IPython.display import clear_output
 
