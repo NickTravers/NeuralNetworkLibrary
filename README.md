@@ -1,7 +1,7 @@
 # NeuralNetworkLibrary
 
 ## 1. OVERVIEW
-This repository contains a neural network library I have built in pytorch for structured data analysis, collaborative filtering, and computer vision problems. The library has been written primarily for my own understanding, but I have made an effort to fully comment it, so that it is readable for anyone who wishes to use or modify it.  
+This repository contains a neural network library I have built in pytorch for structured data analysis, collaborative filtering, computer vision, and natural language processing. The library has been written primarily for my own understanding, but I have made an effort to fully comment it, so that it is readable for anyone who wishes to use or modify it.  
 
 The library was inspired by the 2018 version of the fastai course (http://course18.fast.ai), and began as an effort to reconstruct the associated fastai library, in order to deepen my understanding of the course material and improve my programming skills. As such, the API and many of the variable and function names are deliberately quite similar to fastai. However, while a few simple functions have been copied directly, or with minor modification, from the fastai library or lecture notebooks, this library itself has been written primarily from the ground up, and significantly restructured -- using the fastai library only as a rough conceptual template. 
 
@@ -17,16 +17,11 @@ to be reduced on a machine with significantly less memory.
 
 ## 3. SOFTWARE REQUIREMENTS
 1. Cuda Toolkit version 10.0 or 10.1
-2. Anaconda python 3.7 with following additional packages installed 
-   to the default conda environment called 'base':
-   * pytorch version 1.2 and torchvision version 0.4
-   * OpenCV
-   * GPUtil
-   
-NOTE 1: Probably any pytorch version 1.2+ should also work, but I did not test. <br>
-NOTE 2: If you create a fresh conda environment with 'conda create --name myenv python=3.7' 
-then many additonal packages will need to be installed. See 'Core.py' file in 'General' folder 
-for list of imports. 
+2. Anaconda python 3.7 with following packages installed: 
+pytorch version 1.2 + torchvision version 0.4, numpy, pandas, matplotlib, seaborn, 
+sklearn, skimage, ipython, psutil, gputil, spacy, OpenCV. 
+ 
+NOTE: Probably any pytorch version 1.2+ should also work, but I did not test.
 
 ## 4. CONTENTS
 There are 3 folders: General, Applications, and Examples. 
@@ -55,9 +50,12 @@ Contains library files used for specific applications. These Include:
 2. StructuredData.py - For structured data (i.e. tabular data) problems.
 
 3. Vision.py - For various problems in computer vision, including image classification, 
-                     multi-label image classification, and bounding box object detection. 
+               multi-label image classification, and bounding box object detection. 
 
-In addition, the applications folder contains two subfolders which are used by Vision.py:
+4. Text.py - For various problems in natural language processing, including language modeling 
+             and text classification. 
+
+In addition, the applications folder contains three subfolders:
 
 #### Subfolder 1 - VisionModels
 
@@ -71,7 +69,14 @@ The file retinanet.py is an implementation of the retinanet model for bounding b
 https://github.com/yhenon/pytorch-retinanet. The file RetinanetPretrainedCOCO.pt contains the weights for 
 such a retinanet model pre-trained on the COCO dataset (from the same source). 
 
-#### Subfolder 2 - pycocotools
+#### Subfolder 2 - TextModels
+
+This folder contains the weights for an AWD LSTM language model pre-trained on the wikitext103 corpus.
+Original weights from the fastai implementation of the pre-trained model are available at "http://files.fast.ai/models/wt103/". Our implementation is significantly restructured code-wise 
+from the fastai implementation, but is almost equivalent mathematically, and uses the same pre-trained 
+weight matrices in initialization. 
+
+#### Subfolder 3 - pycocotools
 
 A slightly modified version of the python module pycocotools for evaluating bounding box datasets
 with annotations in the same format as the COCO dataset (modified to properly deal with 'ignore' flags
@@ -93,6 +98,7 @@ The datasets analyzed in the notebooks include:
 4. Pascal Dataset (Bounding Box Object Detection)
 5. MovieLens Dataset (Collaborative Filtering - Movie Ratings Prediction)
 6. Kaggle Rossmann Dataset (Structured Data - Sales Prediction)
+7. IMDB Large Movie Review Dataset (Language Modeling and Text Classification)
 
 NOTE 1: Each of these datasets is used in the fastai 2018 course. My general approach in the Jupyter notebooks,
 is often reasonably similar to the corresponding notebooks from the course. Although, there is often
@@ -121,7 +127,7 @@ Stuff in Applications Folder:
 1. CollabFiltering.py: Imports everything from General folder. 
 2. StructuredData.py: Imports everything from General folder. 
 3. Vision.py: Imports everything from General, VisionModels, and pycocotools folders.
-
+4. Text.py: Imports everything from General folder (also uses saved weights in TextModels folder)
 
 ## 5. OTHER NOTES
 All methods in this library are for supervised learning problems. That is, the training data consists of labeled pairs (x,y), where x is the given input datapoint (e.g. an image) and y is the ground truth output or label for that input (e.g. 'cat' or 'dog'). This naming scheme (x=input, y=output/label) is used in the variable names, docstrings, and comments in the various library files. Outputs predicted by a model are sometimes also denoted by y_hat or y_pred, to distinguish from ground truth values.
@@ -137,7 +143,7 @@ The following names in variables and docstrings are also standard in the library
 **bn**: batch norm <br>
 **cat**: used to denote categorical variables <br>
 **cont**: used to denote continuous or real-valued variables <br>
-**bbox**: bounding box <br>
+**bbox**: bounding box <br> 
 **single_label**: refers to single label image classification, in which each image has 1 label (e.g., 'cat' or 'dog') <br>
 **multi_label**: refers to multi label image classification, in which each image may have multiple labels <br>
                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
