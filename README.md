@@ -18,7 +18,7 @@ to be reduced on a machine with significantly less memory.
 ## 3. SOFTWARE REQUIREMENTS
 1. Cuda Toolkit version 10.0 or 10.1
 2. Anaconda python 3.7 with following packages installed: 
-pytorch version 1.2 + torchvision version 0.4, numpy, pandas, matplotlib, seaborn, 
+pytorch version 1.2 and torchvision version 0.4, numpy, pandas, matplotlib, seaborn, 
 sklearn, skimage, ipython, psutil, gputil, spacy, OpenCV. 
  
 NOTE: Probably any pytorch version 1.2+ should also work, but I did not test.
