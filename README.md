@@ -19,7 +19,7 @@ to be reduced on a machine with significantly less memory.
 1. Cuda Toolkit version 10.0 or 10.1
 2. Anaconda python 3.7 with following packages installed: 
 pytorch version 1.2 and torchvision version 0.4, numpy, pandas, matplotlib, seaborn, 
-sklearn, skimage, ipython, psutil, gputil, spacy, OpenCV. 
+sklearn, skimage, ipython, ipywidgets, jupyterlab, tqdm, psutil, gputil, spacy, OpenCV. 
  
 NOTE: Probably any pytorch version 1.2+ should also work, but I did not test.
 
@@ -88,7 +88,7 @@ For each notebook there is a folder with the same name, which contains any Kaggl
 important files related to the dataset. The datasets themselves are not contained in this repository, 
 for storage reasons, but each notebook provides a link to where the dataset can be downloaded. 
 
-To view the notebooks, you should download or clone the repository and open them with the Jupyter Notebook Application. If you just click on the notebooks from the GitHub page, an error sometimes comes up loading them (and even if they load the display is a bit off in some places).
+To view the notebooks, it is best to download or clone the repository and open them with the Jupyter Notebook Application. If you just click on the notebooks from the GitHub page, an error sometimes comes up loading them (and even if they load the display is a bit off in some places).
 
 The datasets analyzed in the notebooks include:
 
